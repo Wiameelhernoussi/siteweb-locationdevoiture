@@ -6,8 +6,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $car_id = $_POST['car_id'];
     $date_debut = $_POST['date_debut'];
     $date_fin = $_POST['date_fin'];
-    $phone = $_POST['phone'];
-    $address = $_POST['address'];
+    $nom = $_POST['nom'];
+    $telephone = $_POST['telephone'];
+    $email = $_POST['email'];
     $user_email = $_SESSION['user_email'];
 
     // Calculer la différence entre les dates
@@ -26,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $conn = $connection->conn;
 
     // Récupérer le prix par jour de la voiture
-    $query = "SELECT prix_par_jour FROM Cars WHERE car_id = ?";
+    $query = "SELECT prix_par_jour, marque, modele FROM Cars WHERE car_id = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $car_id);
     $stmt->execute();
@@ -72,174 +73,153 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Sign Up</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation de réservation - POO Voiture</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-/* From Uiverse.io by 3HugaDa3 */ 
-.checkbox-wrapper {
-  --checkbox-size: 25px;
-  --checkbox-color: #00ff88;
-  --checkbox-shadow: rgba(0, 255, 136, 0.3);
-  --checkbox-border: rgba(0, 255, 136, 0.7);
-  display: flex;
-  align-items: center;
-  position: relative;
-  cursor: pointer;
-  padding: 10px;
-}
-
-.checkbox-wrapper input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-}
-
-.checkbox-wrapper .checkmark {
-  position: relative;
-  width: var(--checkbox-size);
-  height: var(--checkbox-size);
-  border: 2px solid var(--checkbox-border);
-  border-radius: 8px;
-  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.2);
-  box-shadow: 0 0 15px var(--checkbox-shadow);
-  overflow: hidden;
-}
-
-.checkbox-wrapper .checkmark::before {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(45deg, var(--checkbox-color), #00ffcc);
-  opacity: 0;
-  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  transform: scale(0) rotate(-45deg);
-}
-
-.checkbox-wrapper input:checked ~ .checkmark::before {
-  opacity: 1;
-  transform: scale(1) rotate(0);
-}
-
-.checkbox-wrapper .checkmark svg {
-  width: 0;
-  height: 0;
-  color: #1a1a1a;
-  z-index: 1;
-  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
-}
-
-.checkbox-wrapper input:checked ~ .checkmark svg {
-  width: 18px;
-  height: 18px;
-  transform: rotate(360deg);
-}
-
-.checkbox-wrapper:hover .checkmark {
-  border-color: var(--checkbox-color);
-  transform: scale(1.1);
-  box-shadow:
-    0 0 20px var(--checkbox-shadow),
-    0 0 40px var(--checkbox-shadow),
-    inset 0 0 10px var(--checkbox-shadow);
-}
-
-.checkbox-wrapper input:checked ~ .checkmark {
-  animation: pulse 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 20px var(--checkbox-shadow);
-  }
-  50% {
-    transform: scale(0.9);
-    box-shadow:
-      0 0 30px var(--checkbox-shadow),
-      0 0 50px var(--checkbox-shadow);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 20px var(--checkbox-shadow);
-  }
-}
-
-.checkbox-wrapper .label {
-  margin-left: 15px;
-  font-family: "Segoe UI", sans-serif;
-  color: var(--checkbox-color);
-  font-size: 18px;
-  text-shadow: 0 0 10px var(--checkbox-shadow);
-  opacity: 0.9;
-  transition: all 0.3s;
-}
-
-.checkbox-wrapper:hover .label {
-  opacity: 1;
-  transform: translateX(5px);
-}
-
-/* Glowing dots animation */
-.checkbox-wrapper::after,
-.checkbox-wrapper::before {
-  content: "";
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--checkbox-color);
-  opacity: 0;
-  transition: all 0.5s;
-}
-
-.checkbox-wrapper::before {
-  left: -10px;
-  top: 50%;
-}
-
-.checkbox-wrapper::after {
-  right: -10px;
-  top: 50%;
-}
-
-.checkbox-wrapper:hover::before {
-  opacity: 1;
-  transform: translateX(-10px);
-  box-shadow: 0 0 10px var(--checkbox-color);
-}
-
-.checkbox-wrapper:hover::after {
-  opacity: 1;
-  transform: translateX(10px);
-  box-shadow: 0 0 10px var(--checkbox-color);
-}
-</style>
+        .confirmation-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .confirmation-header {
+            background: #28a745;
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+        .summary-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+        .price-tag {
+            font-size: 1.5rem;
+            color: #28a745;
+            font-weight: bold;
+        }
+        .confirmation-details {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+        .action-buttons {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        .btn-primary {
+            background: #28a745;
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: bold;
+        }
+        .btn-primary:hover {
+            background: #218838;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: bold;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .success-icon {
+            font-size: 3rem;
+            color: #28a745;
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
 <body>
-<label class="checkbox-wrapper">
-  <input type="checkbox" />
-  <div class="checkmark">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path
-        d="M20 6L9 17L4 12"
-        stroke-width="3"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      ></path>
-    </svg>
-  </div>
-  <span class="label"></span>
-</label>
-<a href="payments.php" style="display: block; text-align: center; margin-top: 10px;">
-  <button>Passer au paiement</button>
-</a>
+    <div class="container">
+        <div class="confirmation-container">
+            <div class="confirmation-header">
+                <i class="fas fa-check-circle success-icon"></i>
+                <h2>Confirmation de réservation</h2>
+            </div>
+
+            <div class="confirmation-details">
+                <h3 class="text-center mb-4">Détails de votre réservation</h3>
+
+                <div class="row">
+                    <div class="col-md-6 summary-item">
+                        <strong>Voiture :</strong>
+                        <?php echo htmlspecialchars($car['marque'] . ' ' . $car['modele']); ?>
+                    </div>
+                    <div class="col-md-6 summary-item">
+                        <strong>Prix par jour :</strong>
+                        <span class="price-tag"><?php echo number_format($prix_par_jour, 2, ',', ' '); ?> €</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 summary-item">
+                        <strong>Date de début :</strong>
+                        <?php echo htmlspecialchars($date_debut); ?>
+                    </div>
+                    <div class="col-md-6 summary-item">
+                        <strong>Date de fin :</strong>
+                        <?php echo htmlspecialchars($date_fin); ?>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 summary-item">
+                        <strong>Nombre de jours :</strong>
+                        <?php echo htmlspecialchars($days); ?> jours
+                    </div>
+                    <div class="col-md-6 summary-item">
+                        <strong>Total :</strong>
+                        <span class="price-tag"><?php echo number_format($prix_par_jour * $days, 2, ',', ' '); ?> €</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 summary-item">
+                        <strong>Nom :</strong>
+                        <?php echo htmlspecialchars($nom); ?>
+                    </div>
+                    <div class="col-md-6 summary-item">
+                        <strong>Email :</strong>
+                        <?php echo htmlspecialchars($email); ?>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 summary-item">
+                        <strong>Téléphone :</strong>
+                        <?php echo htmlspecialchars($telephone); ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="cars.php" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour aux voitures
+                </a>
+                <a href="payments.php?car_id=<?php echo $car_id; ?>&days=<?php echo $days; ?>&total=<?php echo $prix_par_jour * $days; ?>" class="btn btn-primary">
+                    <i class="fas fa-credit-card"></i> Procéder au paiement
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
